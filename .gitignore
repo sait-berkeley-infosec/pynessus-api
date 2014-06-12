@@ -19,3 +19,4 @@ venv
 
 # Misc
 *.swp
+*.pyc
