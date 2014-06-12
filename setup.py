@@ -16,4 +16,7 @@ setup(
     author='Arlan Jaska',
     license='MIT',
     packages=find_packages(),
+    install_requires=[
+    "xmltodict >= 0.9.0",
+    ],
 ) 
