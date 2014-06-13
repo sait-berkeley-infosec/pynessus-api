@@ -16,13 +16,13 @@ class Session:
     def __init__(self, user, pw, host='localhost', port=8834):
         self.host = host
         self.port = port
-        self.token = self.get('login', login=user,password=pw)['token']
+        self.token = self.request('login', login=user,password=pw)['token']
 
     def close(self):
         return self.get('logout') == 'OK'
     
-    def get(self, path, **kwargs):
-        if 'token' not in kwargs and hasattr(self, 'token'):
+    def request(self, path, **kwargs, token=None):
+        if token:
             kwargs['token'] = self.token
         kwargs['seq'] = random.randrange(1000000)
         url = 'https://{0}:{1}/{2}'.format(self.host,self.port,path)
