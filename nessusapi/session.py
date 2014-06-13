@@ -1,7 +1,7 @@
 # session.py
 
 import random
-import response_xml
+import xmltodict
 
 # try python 3 imports, fall back to python 2
 try:
@@ -17,7 +17,7 @@ class Session:
         self.host = host
         self.port = port
 
-    def __enter__(self)
+    def __enter__(self):
         self.token = self.get('login', login=user,password=pw)['token']
 
     def __exit__(self, type, value, traceback):
@@ -37,7 +37,7 @@ class Session:
             response_data = xmltodict.parse(response.read())
             if response_data['seq'] != kwargs['seq']:
                 raise Exception("Unique number did not match!")
-            elif response_data['status'] != 'OK'
+            elif response_data['status'] != 'OK':
                 raise AuthenticationError("Invalid credentials")
             return response_data
         except HTTPError as e:
