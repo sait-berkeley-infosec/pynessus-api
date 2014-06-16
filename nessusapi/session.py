@@ -21,7 +21,7 @@ class Session:
     def close(self):
         return self.get('logout') == 'OK'
     
-    def request(self, path, **kwargs, token=None):
+    def request(self, path, token=None, **kwargs):
         if token:
             kwargs['token'] = self.token
         kwargs['seq'] = random.randrange(1000000)
