@@ -19,6 +19,7 @@ class Session:
         self.token = self.request('login', login=user,password=pw)['token']
 
     def close(self):
+        self.token = None
         return self.request('logout') == 'OK'
     
     def request(self, path, token=None, **kwargs):
