@@ -19,12 +19,14 @@ class Session:
         self.token = self.request('login', login=user,password=pw)['token']
 
     def close(self):
-        self.token = None
-        return self.request('logout') == 'OK'
+        if self.request('logout') == 'OK':
+            self.token = None
+            return True
+        return False
     
-    def request(self, path, token=None, **kwargs):
-        if token:
-            kwargs['token'] = self.token
+    def request(self, path, **kwargs):
+        if hasattr(self, 'token'):
+            kwargs['token'] = self.token 
         kwargs['seq'] = random.randrange(1000000)
         url = 'https://{0}:{1}/{2}'.format(self.host,self.port,path)
         request = Request(url, urlencode(kwargs))
