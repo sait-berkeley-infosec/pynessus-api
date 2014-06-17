@@ -18,7 +18,7 @@ class SessionTestCase(unittest.TestCase):
     @mock.patch('nessusapi.session.random')
     @mock.patch('nessusapi.session.urlopen')
     @mock.patch('nessusapi.session.Request')
-    def test_init(self, mock_request, mock_urlopen, mock_random):
+    def test_auth(self, mock_request, mock_urlopen, mock_random):
         mock_random.randrange.return_value = 2811
         mock_urlopen.return_value = StringIO('<?xml version="1.0"?> <reply>'
                                              "<seq>2811</seq>"
@@ -34,6 +34,16 @@ class SessionTestCase(unittest.TestCase):
                                         'login=user&password=pass&seq=2811')
         self.assertEqual(session.token, "ce65ea7")
 
+        mock_random.randrange.return_value = 2817
+        mock_urlopen.return_value = StringIO('<?xml version="1.0"?> <reply>'
+                                             "<seq>2817</seq>"
+                                             "<status>OK</status>"
+                                             "<contents>OK</contents>"
+                                             "</reply>")
+        self.assertTrue(session.close())
+        mock_request.assert_called_with('https://192.0.2.3:8980/logout',
+                                        'seq=2817')
+        self.assertIsNone(session.token)
 
 if __name__ == '__main__':
     unittest.main()
