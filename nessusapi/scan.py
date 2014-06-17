@@ -7,7 +7,7 @@ class Scan:
         self.policy = policy
         self.session = session
         self.uuid = session.request('scan/new', target=self.target,
-                                    scan_name=self.scan_name,
+                                    scan_name=self.name,
                                     policy_id=self.policy)['uuid']
         
     def stop(self):
