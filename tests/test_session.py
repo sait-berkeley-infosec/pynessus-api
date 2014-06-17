@@ -33,11 +33,7 @@ class SessionTestCase(unittest.TestCase):
         mock_urlopen.return_value = StringIO('<?xml version="1.0"?> <reply>'
                                              "<seq>2813</seq>"
                                              "<status>OK</status>"
-                                             "<contents><token>abcdef01</token>"
-                                             "<user>"
-                                             "<name>admin</name>"
-                                             "<admin>TRUE</admin>"
-                                             "</user></contents>"
+                                             "<contents>OK</contents>"
                                              "</reply>")
         session.request('test/url', arg1="arg1value", arg2="arg2value")
         mock_request.assert_called_with('https://192.0.2.7:8981/test/url',
