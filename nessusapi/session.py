@@ -13,10 +13,12 @@ except ImportError:
     from urllib2 import urlopen, Request, URLError, HTTPError
 
 class Session:
+    current = None
     def __init__(self, user, pw, host='localhost', port=8834):
         self.host = host
         self.port = port
         self.token = self.request('login', login=user,password=pw)['token']
+        Session.current = self
 
     def close(self):
         if self.request('logout') == 'OK':
@@ -39,6 +41,13 @@ class Session:
             raise AuthenticationError
         except URLError as e:
             raise ConnectionError
+
+def require_auth(f):
+    def with_auth(self, *args, **kwargs):
+        self.session = Session.current
+        return f(self, *args, **kwargs)
+    return with_auth
+    
 
 class ConnectionError(Exception):
     pass
