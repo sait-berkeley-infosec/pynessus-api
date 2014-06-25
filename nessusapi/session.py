@@ -36,7 +36,6 @@ class Session:
             response_data = xmltodict.parse(response.read())['reply']
             if response_data['status'] != 'OK':
                 raise AuthenticationError("Invalid credentials")
-            print(response_data)
             return response_data['contents']
         except HTTPError as e:
             raise 
