@@ -1,30 +1,40 @@
 # scan.py
 
-from session import require_auth
+from session import request, HTTPError 
 
 class Scan:
     def __init__(self, target, scan_name, policy):
         self.target = target
         self.name = scan_name
         self.policy = policy
+        self.uuid = None
 
-    @require_auth
     def start(self):
-        self.uuid = self.session.request('scan/new', target=self.target,
-                                    scan_name=self.name,
-                                    policy_id=self.policy)['scan']['uuid']
+        if self.uuid:
+            raise BadRequestError('Scan already started')
+        try:
+            self.uuid = request('scan/new', target=self.target,
+                                        scan_name=self.name,
+                                        policy_id=self.policy)['scan']['uuid']
+        except HTTPError as e:
+            if e.code == 404 and 'Unknown policy' in e.read():
+                raise BadRequestError('Unknown policy')
+            raise
         
     def stop(self):
-        return self.changeStatus('stop')
+        if self.changeStatus('stop') == 'stopping':
+            self.uuid = None
+            return True
+        return False
 
     def pause(self):
-        return self.changeStatus('pause')
+        return self.changeStatus('pause') == 'pausing'
 
     def resume(self):
-        return self.changeStatus('resume')
+        return self.changeStatus('resume') == 'resuming'
     
-    @require_auth
     def changeStatus(self, status):
-        return self.session.request('scan/{0}'.format(status),
-                                    scan_uuid=uuid)['status'] == 'OK'
-                                    
+        if not self.uuid:
+            raise BadRequestError('Scan not started')
+        return request('scan/{0}'.format(status),
+                       scan_uuid=self.uuid)['scan']['status']

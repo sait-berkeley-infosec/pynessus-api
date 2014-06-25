@@ -36,20 +36,20 @@ class Session:
             response_data = xmltodict.parse(response.read())['reply']
             if response_data['status'] != 'OK':
                 raise AuthenticationError("Invalid credentials")
+            print(response_data)
             return response_data['contents']
         except HTTPError as e:
-            raise AuthenticationError
+            raise 
         except URLError as e:
-            raise ConnectionError
+            raise# ConnectionError
 
-def require_auth(f):
-    def with_auth(self, *args, **kwargs):
-        self.session = Session.current
-        return f(self, *args, **kwargs)
-    return with_auth
-    
+def request(path, **kwargs):
+    return Session.current.request(path, **kwargs)
 
 class ConnectionError(Exception):
+    pass
+
+class BadRequestError(Exception):
     pass
 
 class AuthenticationError(Exception):
