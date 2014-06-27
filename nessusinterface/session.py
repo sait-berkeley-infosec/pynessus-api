@@ -2,10 +2,11 @@ from nessusapi.session import Session
 from getpass import getpass
 
 def authenticate():
-    Session( prompt("Username"),
-             prompt("Password", hidden=True),
-             prompt("Host", "127.0.0.1"),
-             prompt("Port", "8834") )
+    print("Logging into Nessus instance")
+    Session( prompt("Host", "127.0.0.1"),
+             prompt("Port", "8834"),
+             prompt("Username"),
+             prompt("Password", hidden=True) )
 
 def prompt(text, default=None, hidden=False):
     choice = ""
