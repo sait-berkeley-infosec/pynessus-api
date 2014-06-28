@@ -2,12 +2,12 @@ from nessusapi.session import Session
 from getpass import getpass
 
 def authenticate():
-    Session( prompt("Username"),
-             prompt("Password", hidden=True),
-             prompt("Host", "127.0.0.1"),
-             prompt("Port", "8834") )
+    Session(_prompt("Username"),
+            _prompt("Password", hidden=True),
+            _prompt("Host", "127.0.0.1"),
+            _prompt("Port", "8834"))
 
-def prompt(text, default=None, hidden=False):
+def _prompt(text, default=None, hidden=False):
     choice = ""
     while choice == "":
         prompt = "{0}{1}: ".format(text, " (default: {0})".format(default) if default else "")
@@ -16,7 +16,7 @@ def prompt(text, default=None, hidden=False):
         else:
             choice = raw_input(prompt)
 
-        if choice == "" and default is not None:
+        if not choice and default is not None:
             return default
     return choice
             
