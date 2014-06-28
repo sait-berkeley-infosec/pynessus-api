@@ -1,5 +1,6 @@
-from nessusapi.session import Session
 from getpass import getpass
+
+from nessusapi.session import Session
 
 def authenticate():
     print("Connecting to Nessus API")
