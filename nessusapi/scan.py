@@ -1,6 +1,4 @@
-# scan.py
-
-from session import request, HTTPError 
+from nessusapi.session import request, HTTPError 
 
 class Scan:
     def __init__(self, target, scan_name, policy):

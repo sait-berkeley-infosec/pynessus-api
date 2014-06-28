@@ -1,6 +1,4 @@
-# template.py
-
-from session import request
+from nessusapi.session import request
 
 class Template:
     # startTime is scan start date (ISO format)
@@ -31,8 +29,8 @@ class Template:
         self.target = results['target']
         # self.time and rRules?
 
-    # returns uuid of launched scan
     def launch(self):
+        """Launch a scan and return its UUID"""
         return request('scan/template/launch',
                                     template=self.nessus_name)['uuid']
 

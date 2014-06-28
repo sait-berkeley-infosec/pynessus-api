@@ -1,26 +1,43 @@
 import time
+
 from nessusapi.report import list_reports
 
 def select_report():
+    """
+    Present a command line interface to easily select a report from the
+    report Nessus server, and return the report's UUID.
+    """
     report_data = list_reports()
     reports = [report for report in report_data]
     reports.reverse()
-    selected = None
-    print("Please select a report (most recent first)")
+
     index = 0
+    selected = None
+    print("\nPlease select a report (most recent first)")
+
     while selected is None:
-        print("\n"+"="*75)
-        print("Showing reports {0} to {1} (of {2})".format(index+1,index+10,len(reports)))
+        print("="*75)
+        print("Showing reports {0} to {1} (of {2}) Most recent reports first."
+            .format(index+1,min(index+10,len(reports)),len(reports)))
         for i in range(10):
             try:
-                timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(reports[index+i]['timestamp'])))
+                timestamp = time.strftime(
+                    "%Y-%m-%d %H:%M:%S",
+                    time.localtime(int(reports[index+i]['timestamp'])))
                 name = reports[index+i]['readableName']
                 status = reports[index+i]['status']
-                print("  [{0}] ({1}) {2} {3}".format(i, timestamp, name, "[{0}]".format(status) if status != 'completed' else ''))
+                # list each report with the format:
+                # [#] (date) Report Name {status}
+                # {status} is only shown if it is not 'completed'
+                print("  [{0}] ({1}) {2} {3}".format(
+                    i, timestamp, name, 
+                    "[{0}]".format(status) if status != 'completed' else ''))
                 max_choice = i
             except IndexError:
                 pass
         choice = raw_input("Selection (n for next page, p for prev): ")
+        print("\n")
+
         if choice == 'n' and len(reports) > index+10:
             index += 10
         elif choice == 'p' and index >= 10:
@@ -29,10 +46,10 @@ def select_report():
             try:
                 selected = int(choice)
                 if not selected in range(max_choice+1):
-                    selected = None
                     raise ValueError
             except ValueError:
                 print(" >>> Invalid selection <<<")
+                selected = None
                 continue
           
     return reports[index+selected]['name']

@@ -1,14 +1,17 @@
-from nessusapi.session import Session
 from getpass import getpass
 
-def authenticate():
-    print("Logging into Nessus instance")
-    Session( prompt("Host", "127.0.0.1"),
-             prompt("Port", "8834"),
-             prompt("Username"),
-             prompt("Password", hidden=True) )
+from nessusapi.session import Session
 
-def prompt(text, default=None, hidden=False):
+def authenticate():
+    print("Connecting to Nessus API")
+    host=_prompt("Host", "127.0.0.1")
+    port=_prompt("Port", "8834")
+    Session(_prompt("Username"),
+            _prompt("Password", hidden=True),
+            host,
+            port)
+
+def _prompt(text, default=None, hidden=False):
     choice = ""
     while choice == "":
         prompt = "{0}{1}: ".format(text, " (default: {0})".format(default) if default else "")
@@ -17,7 +20,7 @@ def prompt(text, default=None, hidden=False):
         else:
             choice = raw_input(prompt)
 
-        if choice == "" and default is not None:
+        if not choice and default is not None:
             return default
     return choice
             
