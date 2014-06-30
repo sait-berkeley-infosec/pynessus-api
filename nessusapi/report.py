@@ -12,6 +12,14 @@ def list_reports():
     """
     return _ensure_list(request('report/list')['reports']['report'])
 
+def download_report(report):
+    """
+    Return the entirety of a Nessus report - which is a glorified
+    XML file. There is no filtering, and can be used to save directly
+    to a file.
+    """
+    return request('file/report/download')
+
 def list_hosts(report):
     """
     Return a list of hosts included in a specified report uuid. 
