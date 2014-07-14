@@ -52,7 +52,7 @@ def select_report():
                 selected = None
                 continue
           
-    return reports[index+selected]['name']
+    return reports[index+selected]
 
 def get_reports_between(start, end):
     """
