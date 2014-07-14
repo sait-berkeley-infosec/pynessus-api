@@ -54,3 +54,29 @@ def select_report():
           
     return reports[index+selected]['name']
 
+def get_reports_between(start, end):
+    """
+    Go through all of the reports available to us. Carve out
+    the ones that are between start and end, which are both
+    POSIX timestamps.
+
+    Returns an array of all reports within the given timeframe.
+    """
+    report_data = list_reports()
+    reports = [report for report in report_data]
+    reports.reverse()
+    selected_reports = []
+
+    for report in reports:
+        report_time = time.mktime(time.localtime(int(report['timestamp'])))
+        timestamp = time.strftime(
+            "%Y-%m-%d %H:%M:%S",
+            time.localtime(int(report['timestamp'])))
+        name = report['readableName']
+        status = report['status']
+        if start < report_time < end and status == 'completed':
+            print("Found report: ({0}) {1}".format(
+                timestamp, name))
+            selected_reports.append(report)
+
+    return selected_reports
