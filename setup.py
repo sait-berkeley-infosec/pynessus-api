@@ -13,6 +13,7 @@ tests_require = [
 
 install_requires = [
     'xmltodict >= 0.9.0',
+    'requests >= 2.5.1',
 ]
 
 setup(
