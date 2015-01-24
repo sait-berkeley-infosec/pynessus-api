@@ -58,15 +58,3 @@ def _normalize_args(func, *args, **kwargs):
 
     return new_args, new_kwargs
 
-"""@multiton
-class A():
-    def __init__(self, a, b=10, *args, **kwargs):
-        self.a = a
-        self.b = b
-
-A(1)
-A(1, 10)
-A(1, b=10)
-A(1, 10, 11, 12, 13)
-A(1, 10, 11, 12, 13, d=14, e=15, f=16)
-A(1, b=10, d=14, e=15, f=16)"""
