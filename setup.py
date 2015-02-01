@@ -9,6 +9,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 tests_require = [
     'mock >= 1.0.1',
+    'nose >= 1.3.4',
 ]
 
 install_requires = [
