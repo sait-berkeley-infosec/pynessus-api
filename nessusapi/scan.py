@@ -1,6 +1,6 @@
 from nessusapi.session import request, HTTPError 
 
-class Scan:
+class Scan(object):
     def __init__(self, target, scan_name, policy):
         self.target = target
         self.name = scan_name

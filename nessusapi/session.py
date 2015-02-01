@@ -1,10 +1,7 @@
-import random
-# try python 3 imports, fall back to python 2
-
 import requests
 import xmltodict
 
-class Session:
+class Session(object):
     def __init__(self, user, pw, host, port, verifySSL=True):
         """Create a session and make it the active one"""
         self.host = host

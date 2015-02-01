@@ -4,7 +4,7 @@ from nessusapi.utils import multiton
 from nessusapi.vulnerability import Vulnerability
 
 @multiton
-class Report:
+class Report(object):
     def __init__(self, nessus, uuid):
         self.nessus = nessus
         self.uuid = uuid
@@ -101,7 +101,7 @@ class Report:
                self.timestamp, self.status, self.uuid, self.name)
 
 @multiton
-class Host:
+class Host(object):
     def __init__(self, nessus, report, hostname): #, total, level_counts):
         self.nessus = nessus
         self.report = report

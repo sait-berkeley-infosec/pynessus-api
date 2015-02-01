@@ -5,7 +5,7 @@ from nessusapi.session import Session
 from nessusapi.report import Host, Report
 from nessusapi.vulnerability import Vulnerability
 
-class Nessus:
+class Nessus(object):
     def __init__(self, user, pw, host='localhost', port=8834, verifySSL=True):
         """Create a session and make it the active one"""
         self.session = Session(user, pw, host=host, port=port, verifySSL=verifySSL)
