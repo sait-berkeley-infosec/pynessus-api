@@ -1,6 +1,8 @@
+# coding=utf-8
+
 import time
 
-from nessusinterface.session import authenticate
+from .session import authenticate
 
 def select_report(nessus=None):
     """
