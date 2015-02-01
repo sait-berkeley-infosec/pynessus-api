@@ -1,7 +1,9 @@
+# coding=utf-8
+
 import time
 
-from nessusapi.utils import multiton
-from nessusapi.vulnerability import Vulnerability
+from .utils import multiton
+from .vulnerability import Vulnerability
 
 @multiton
 class Report(object):

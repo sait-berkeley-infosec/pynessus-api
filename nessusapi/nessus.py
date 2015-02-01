@@ -1,9 +1,11 @@
+# coding=utf-8
+
 import os
 import xmltodict
 
-from nessusapi.session import Session
-from nessusapi.report import Host, Report
-from nessusapi.vulnerability import Vulnerability
+from .session import Session
+from .report import Host, Report
+from .vulnerability import Vulnerability
 
 class Nessus(object):
     def __init__(self, user, pw, host='localhost', port=8834, verifySSL=True):
@@ -47,6 +49,12 @@ class Nessus(object):
 
     def _request(self, path, **kwargs):
         return self.session.request(path, **kwargs)
+
+    def request_single(self, path, *keys, **kwargs):
+        request = self._request(path, **kwargs)
+        for key in keys:
+            request = request[key]
+        return request
 
     def request_list(self, path, *keys, **kwargs):
         try:
