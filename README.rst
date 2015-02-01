@@ -9,6 +9,10 @@ library that provide an easy-to-use user interface on the command line
 to the Nessus server. It can be used by itself, integrated into other
 scripts, or used as a reference.
 
+*nessusapi* was recently rewriten to be more pythonic, and *nessusinterface*
+is now broken. Additionally, the tests need re-writing as the functionality
+they tested has since been removed.
+
 pynessus-api aims to support Python 2.6+ and Python 3+
 
 =======
@@ -22,10 +26,10 @@ with the goal of being integrated with the `Nessus Parser`_.
 To-Do
 =====
 
-* Increase test coverage
-* Improve API support (nessusapi)
+* Re-create tests
+* Re-create interface module
+* Improve API coverage (nessusapi)
 * Create full CLI interface
-* Add support for multiple, simultaneously active sessions
 
 .. _Ruby Nessus API: https://github.com/sait-berkeley-infosec/nessus_api
 
