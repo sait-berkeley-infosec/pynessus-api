@@ -3,9 +3,9 @@
 import os
 import xmltodict
 
-from nessusapi.session import Session
-from nessusapi.report import Host, Report
-from nessusapi.vulnerability import Vulnerability
+from .session import Session
+from .report import Host, Report
+from .vulnerability import Vulnerability
 
 class Nessus(object):
     def __init__(self, user, pw, host='localhost', port=8834, verifySSL=True):
