@@ -9,9 +9,8 @@ library that provide an easy-to-use user interface on the command line
 to the Nessus server. It can be used by itself, integrated into other
 scripts, or used as a reference.
 
-*nessusapi* was recently rewriten to be more pythonic, and *nessusinterface*
-is now broken. Additionally, the tests need re-writing as the functionality
-they tested has since been removed.
+*nessusapi* was recently rewriten to be more pythonic. The tests need
+re-writing as the functionality they tested has since been altered.
 
 pynessus-api aims to support Python 2.6+ and Python 3+
 
@@ -27,7 +26,6 @@ To-Do
 =====
 
 * Re-create tests
-* Re-create interface module
 * Improve API coverage (nessusapi)
 * Create full CLI interface
 
