@@ -1,20 +1,16 @@
-from nessusapi.session import request, HTTPError 
+# coding=utf-8
 
 class Scan(object):
-    def __init__(self, target, scan_name, policy):
+    def __init__(self, nessus, target, scan_name, policy):
+        self.nessus = nessus
         self.target = target
         self.name = scan_name
         self.policy = policy
-        self.uuid = None
 
-        try:
-            self.uuid = request('scan/new', target=self.target,
-                                        scan_name=self.name,
-                                        policy_id=self.policy)['scan']['uuid']
-        except HTTPError as e:
-            if e.code == 404 and 'Unknown policy' in e.read():
-                raise BadRequestError('Unknown policy')
-            raise
+        self.uuid = self.nessus.request_single('scan/new', 'scan', 'uuid',
+                                    target=self.target,
+                                    scan_name=self.name,
+                                    policy_id=self.policy)
 
     def stop(self):
         if self.changeStatus('stop') == 'stopping':
@@ -31,8 +27,9 @@ class Scan(object):
     def changeStatus(self, status):
         if not self.uuid:
             raise BadRequestError('Scan not started')
-        return request('scan/{0}'.format(status),
-                       scan_uuid=self.uuid)['scan']['status']
+        return self.nessus.request_single('scan/{0}'.format(status),
+                                          'scan', 'status',
+                                          scan_uuid=self.uuid)
 
 class BadRequestError(Exception):
     pass
