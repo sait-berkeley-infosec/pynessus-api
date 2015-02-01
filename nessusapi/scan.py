@@ -7,9 +7,6 @@ class Scan:
         self.policy = policy
         self.uuid = None
 
-    def start(self):
-        if self.uuid:
-            raise BadRequestError('Scan already started')
         try:
             self.uuid = request('scan/new', target=self.target,
                                         scan_name=self.name,
@@ -18,7 +15,7 @@ class Scan:
             if e.code == 404 and 'Unknown policy' in e.read():
                 raise BadRequestError('Unknown policy')
             raise
-        
+
     def stop(self):
         if self.changeStatus('stop') == 'stopping':
             self.uuid = None
@@ -36,3 +33,6 @@ class Scan:
             raise BadRequestError('Scan not started')
         return request('scan/{0}'.format(status),
                        scan_uuid=self.uuid)['scan']['status']
+
+class BadRequestError(Exception):
+    pass
