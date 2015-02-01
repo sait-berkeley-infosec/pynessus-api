@@ -1,16 +1,15 @@
 from getpass import getpass
 import os
 
-from nessusapi.session import Session
+from nessusapi.nessus import Nessus
 
 def authenticate():
     print("Connecting to Nessus API")
     host=os.getenv('NESSUS_HOST') or _prompt("Host", "127.0.0.1")
     port=os.getenv('NESSUS_PORT') or _prompt("Port", "8834")
-    Session(os.getenv('NESSUS_USER') or _prompt("Username"),
-            os.getenv('NESSUS_PASS') or _prompt("Password", hidden=True),
-            host,
-            port)
+    user=os.getenv('NESSUS_USER') or _prompt("Username")
+    pass_=os.getenv('NESSUS_PASS') or _prompt("Password", hidden=True)
+    return Nessus(user, pass_, host, port)
 
 def _prompt(text, default=None, hidden=False):
     choice = ""
