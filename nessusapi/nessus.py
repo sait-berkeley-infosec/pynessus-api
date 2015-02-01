@@ -10,9 +10,6 @@ class Nessus(object):
         """Create a session and make it the active one"""
         self.session = Session(user, pw, host=host, port=port, verifySSL=verifySSL)
 
-    def __del__(self):
-        self.logout()
-    
     @classmethod
     def from_env(cls):
         # os.environ throws an error if the key is not present
