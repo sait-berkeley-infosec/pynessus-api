@@ -1,13 +1,16 @@
 import time
 
-from nessusapi.report import list_reports
+from nessusinterface.session import authenticate
 
-def select_report():
+def select_report(nessus=None):
     """
     Present a command line interface to easily select a report from the
     report Nessus server, and return the report's UUID.
     """
-    report_data = list_reports()
+    if nessus is None:
+        nessus = authenticate()
+
+    report_data = nessus.reports
     reports = [report for report in report_data]
     reports.reverse()
 
@@ -23,9 +26,9 @@ def select_report():
             try:
                 timestamp = time.strftime(
                     "%Y-%m-%d %H:%M:%S",
-                    time.localtime(int(reports[index+i]['timestamp'])))
-                name = reports[index+i]['readableName']
-                status = reports[index+i]['status']
+                    time.localtime(int(reports[index+i].timestamp)))
+                name = reports[index+i].name
+                status = reports[index+i].status
                 # list each report with the format:
                 # [#] (date) Report Name {status}
                 # {status} is only shown if it is not 'completed'
@@ -54,7 +57,7 @@ def select_report():
           
     return reports[index+selected]
 
-def get_reports_between(start, end):
+def get_reports_between(start, end, nessus=None):
     """
     Go through all of the reports available to us. Carve out
     the ones that are between start and end, which are both
@@ -62,18 +65,20 @@ def get_reports_between(start, end):
 
     Returns an array of all reports within the given timeframe.
     """
-    report_data = list_reports()
-    reports = [report for report in report_data]
+    if nessus is None:
+        nessus = authenticate()
+
+    reports = nessus.reports
     reports.reverse()
     selected_reports = []
 
     for report in reports:
-        report_time = time.mktime(time.localtime(int(report['timestamp'])))
+        report_time = time.mktime(time.localtime(int(report.timestamp)))
         timestamp = time.strftime(
             "%Y-%m-%d %H:%M:%S",
-            time.localtime(int(report['timestamp'])))
-        name = report['readableName']
-        status = report['status']
+            time.localtime(int(report.timestamp)))
+        name = report.name
+        status = report.status
         if start < report_time < end and status == 'completed':
             print("Found report: ({0}) {1}".format(
                 timestamp, name))
