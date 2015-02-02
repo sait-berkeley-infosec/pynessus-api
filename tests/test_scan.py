@@ -1,29 +1,25 @@
-#!/usr/bin/env python
 # coding=utf-8
 
 try:
     import unittest.mock as mock
 except ImportError:
     import mock
+
 import unittest
-try: 
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+import nessusapi.scan
 
-from nessusapi.scan import Scan
-from nessusapi.session import Session
-
-class SessionTestCase(unittest.TestCase):
+class TestScan(unittest.TestCase):
     def test_init(self):
-        fake_session = mock.MagicMock(Session)
-        fake_session.request.return_value = {'uuid': 'e3b4f63f-de03-ec8b'}
-        scan = Scan('192.0.2.9', 'TestScan', '5', fake_session)
+        fake_nessus = mock.Mock(request_single=
+                                mock.Mock(return_value='e3b4f63f-de03-ec8b'))
+
+        scan = nessusapi.scan.Scan(fake_nessus,'192.0.2.9', 'TestScan', 5)
         self.assertEqual(scan.uuid, 'e3b4f63f-de03-ec8b')
-        fake_session.request.assert_called_with('scan/new',
+        fake_nessus.request_single.assert_called_with('scan/new',
+                                                'scan', 'uuid',
                                                 target='192.0.2.9',
                                                 scan_name='TestScan',
-                                                policy_id='5')
+                                                policy_id=5)
 
 if __name__ == '__main__':
     unittest.main()

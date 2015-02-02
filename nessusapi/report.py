@@ -1,62 +1,140 @@
-from nessusapi.session import request
+# coding=utf-8
 
-def list_reports():
-    """
-    Return a list of available reports from the Nessus server.
+import time
 
-    Each report is an OrderedDict with the following useful fields:
-    timestamp -- the time the scan was created, as POSIX time
-    status -- the status of the report, e.g. 'completed'
-    name -- the uuid of the report
-    readableName -- the human-readable name specified for the report
-    """
-    return _ensure_list(request('report/list')['reports']['report'])
+from .utils import multiton
+from .vulnerability import Vulnerability
 
-def download_report(report):
-    """
-    Return the entirety of a Nessus report - which is a glorified
-    XML file. There is no filtering, and can be used to save directly
-    to a file.
-    """
-    return request('file/report/download')
+@multiton
+class Report(object):
+    def __init__(self, nessus, uuid):
+        self.nessus = nessus
+        self.uuid = uuid
 
-def list_hosts(report):
-    """
-    Return a list of hosts included in a specified report uuid. 
+        self.timestamp = None
+        self.name = None
 
-    Each host is an OrderedDict with many fields, but the most useful
-    one is:
-    hostname -- the hostname of the host (e.g. server1.domain.org)
-    """
-    return _ensure_list(request('report/hosts', report=report)['hostList']['host'])
+        self._status = None
+        self._completed = False # lets us know if the caches need to be updated
 
-def list_vulns(report):
-    """
-    Return a list of vulnerabilities included in a specified report uuid.
+        # Caches
+        self.hosts_list = [] 
+        self.vulns_list = []
+    
+    @property
+    def status(self):
+        if self._status != 'completed':
+            self.nessus.reports # force cache update
+        return self._status
 
-    Each vuln is an OrderedDict with the following useful fields:
-    plugin_id -- numeric ID by which Nessus identifies the plugin 
-    plugin_name -- the human-readable name for the plugin
-    plugin_family -- the family which the plugin is in, e.g. 'DNS'
-    count -- the number of occurrences of the vulnerability in the report
-    severity -- the severity from 0 to 5, 0 being the least severe
-    """
-    return _ensure_list(request('report2/vulnerabilities', report=report)['vulnList']['vulnerability'])
+    @status.setter
+    def status(self, value):
+        if self._status != 'completed' and value == 'completed':
+            # Invalidate the caches
+            self._completed = True
+            self.hosts_list = None
+            self.vulns_list = None 
 
-def list_affected_hosts(report, plugin, severity):
-    """
-    Return a list of hosts affected by a specified plugin.
+        self._status = value
 
-    For some reason, Nessus requires that the severity also be included.
-    Each host is an OrderedDict with the following useful fields:
-    hostname -- the hostname of the host (e.g. server1.domain.org)
-    port -- the port to which the plugin applies
-    protocol -- the protocol (typically tcp or udp) to which the plugin applies
-    """
-    return _ensure_list(request('report2/hosts/plugin', report=report, plugin_id=plugin, severity=severity)['hostList']['host'])
+    @property
+    def hosts(self):
+        if not self.hosts_list or not self._completed:
+            self.hosts_list = self._list_hosts()
+        return self.hosts_list
 
-# requests sometimes do not return lists, so make them lists
-def _ensure_list(obj):
-    if not isinstance(obj, list):
-        return [obj]
-    return obj
+    @property
+    def vulns(self):
+        if not self.vulns_list or not self._completed:
+            self.vulns_list = self._list_vulns()
+        return self.vulns_list
+
+    def _list_hosts(self):
+        """
+        Return a list of hosts included in a specified report uuid. 
+        """
+        raw_list = self.nessus.request_list('report2/hosts', 'hostList', 'host', report=self.uuid)
+
+        hosts = []
+        for host in raw_list:
+            h = Host(nessus=self.nessus, report=self, hostname=host['hostname'])
+            h.total = host['severity']
+            level_counts = host['severityCount']['item']
+            h.counts = ( level_counts[0], level_counts[1], level_counts[2],
+                         level_counts[3], level_counts[4] )
+
+            hosts.append(h)
+        
+        return hosts
+
+    def _list_vulns(self):
+        """
+        Return a list of vulnerabilities included in a specified report
+        """
+        raw_list = self.nessus.request_list('report2/vulnerabilities', 'vulnList', 'vulnerability', report=self.uuid)
+        
+        vulns = []
+        for vuln in raw_list:
+            v = Vulnerability(nessus=self.nessus, plugin_id=vuln['plugin_id'], severity=vuln['severity'])
+            v._name = vuln['plugin_name'] # unsafe, should use proper setters
+            v._family = vuln['plugin_family']
+            vulns.append(v)
+
+        return vulns
+    
+    def hosts_affected_by(self, vuln):
+        raw_list = self.nessus.request_list('report2/hosts/plugin', 'hostList', 'host', report=self.uuid, severity=vuln.severity, plugin_id=vuln.plugin_id)
+
+        hosts = []
+        for host in raw_list:
+            h = Host(nessus=self.nessus, report=self, hostname=host['hostname'])
+            hosts.append(h)
+
+        return hosts
+
+    def __str__(self):
+        timestamp = time.strftime(
+            "%Y-%m-%d %H:%M:%S",
+            time.localtime(self.timestamp))
+        return """Report "{0}" {1} ({2})""".format(
+               self.name, timestamp, self.status)
+    def __repr__(self):
+        return """Report({0}, {1}, {2}, {3})""".format(
+               self.timestamp, self.status, self.uuid, self.name)
+
+@multiton
+class Host(object):
+    def __init__(self, nessus, report, hostname): #, total, level_counts):
+        self.nessus = nessus
+        self.report = report
+        self.hostname = hostname
+
+        self.total = None
+        self.counts = None
+
+    @property
+    def info(self):
+        return self.counts[0]
+
+    @property
+    def low(self):
+        return self.counts[1]
+
+    @property
+    def med(self):
+        return self.counts[2]
+
+    @property
+    def high(self):
+        return self.counts[3]
+
+    @property
+    def critical(self):
+        return self.counts[4]
+
+    #def __str__(self):
+    #    return "Host {0}".format(self.hostname)
+
+    #def __repr__(self):
+    #    return "Host {0} [{1},{2},{3},{4},{5}]".format(self.hostname, self.info, self.low, self.med, self.high, self.critical)
+

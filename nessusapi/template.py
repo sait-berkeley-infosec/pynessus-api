@@ -1,4 +1,6 @@
-from nessusapi.session import request
+# coding = utf-8
+
+from .session import request
 
 class Template:
     # startTime is scan start date (ISO format)
