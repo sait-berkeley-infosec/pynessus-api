@@ -132,6 +132,11 @@ class Host(object):
     def critical(self):
         return self.counts[4]
 
+    @property
+    def cpe(self):
+        raw_data = self.nessus.request_single('report2/details/plugin', 'portDetails', 'ReportItem', 'data', 'plugin_output', report=self.report.uuid, hostname=self.hostname, port=0, protocol='tcp', severity=0, plugin_id=45590)
+        return raw_data
+
     #def __str__(self):
     #    return "Host {0}".format(self.hostname)
 
