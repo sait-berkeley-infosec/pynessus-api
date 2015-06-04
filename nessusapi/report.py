@@ -134,7 +134,10 @@ class Host(object):
 
     @property
     def cpe(self):
-        raw_data = self.nessus.request_single('report2/details/plugin', 'portDetails', 'ReportItem', 'data', 'plugin_output', report=self.report.uuid, hostname=self.hostname, port=0, protocol='tcp', severity=0, plugin_id=45590)
+        try:
+            raw_data = self.nessus.request_single('report2/details/plugin', 'portDetails', 'ReportItem', 'data', 'plugin_output', report=self.report.uuid, hostname=self.hostname, port=0, protocol='tcp', severity=0, plugin_id=45590)
+        except TypeError: # when cpe doesn't exist for host
+            raw_data = ''
         return raw_data
 
     #def __str__(self):
