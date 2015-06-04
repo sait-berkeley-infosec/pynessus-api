@@ -1,11 +1,10 @@
 # coding=utf-8
 
 import os
-import xmltodict
 
 from .session import Session
-from .report import Host, Report
-from .vulnerability import Vulnerability
+from .report import Report
+
 
 class Nessus(object):
     def __init__(self, user, pw, host='localhost', port=8834, verifySSL=True):
@@ -16,7 +15,7 @@ class Nessus(object):
     def from_env(cls):
         # os.environ throws an error if the key is not present
         user = os.environ['NESSUS_USERNAME']
-        pw   = os.environ['NESSUS_PASSWORD']
+        pw = os.environ['NESSUS_PASSWORD']
         # os.getenv does not throw errors, and allows for a default value
         host = os.getenv('NESSUS_HOST', 'localhost')
         port = os.getenv('NESSUS_PORT', 8834)
@@ -27,7 +26,7 @@ class Nessus(object):
     def logout(self):
         """Log out of the API and invalidate the token"""
         self.session.close()
-    
+
     @property
     def reports(self):
         raw_list = self.request_list('report/list', 'reports', 'report')
@@ -39,12 +38,18 @@ class Nessus(object):
             r.status = report['status']
             r.name = report['readableName']
             reports.append(r)
-        
+
         return reports
 
     def _host_details(self, report, host):
-        tcp_list = request_list(self._request('report/details', report=report.uuid, hostname=host.hostname, protocol='tcp')['portDetails']['ReportItem'])
-        udp_list = request_list(self._request('report/details', report=report.uuid, hostname=host.hostname, protocol='udp')['portDetails']['ReportItem'])
+        tcp_list = self.request_list(self._request('report/details',
+                                                   report=report.uuid,
+                                                   hostname=host.hostname,
+                                                   protocol='tcp')['portDetails']['ReportItem'])
+        udp_list = self.request_list(self._request('report/details',
+                                                   report=report.uuid,
+                                                   hostname=host.hostname,
+                                                   protocol='udp')['portDetails']['ReportItem'])
         return tcp_list + udp_list
 
     def _request(self, path, **kwargs):
@@ -65,15 +70,17 @@ class Nessus(object):
         except TypeError:
             return []
 
+
 # requests sometimes do not return lists, so use this to make them lists
 def _ensure_list(obj):
     if not isinstance(obj, list):
         return [obj]
     return obj
 
+
 class ConnectionError(Exception):
     pass
 
+
 class AuthenticationError(Exception):
     pass
-

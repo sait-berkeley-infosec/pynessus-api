@@ -7,11 +7,6 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
-tests_require = [
-    'mock >= 1.0.1',
-    'nose >= 1.3.4',
-]
-
 install_requires = [
     'xmltodict >= 0.9.0',
     'requests >= 2.5.1',
@@ -28,5 +23,4 @@ setup(
     license='MIT',
     packages=find_packages(),
     install_requires=install_requires,
-    tests_require=tests_require,
-) 
+)

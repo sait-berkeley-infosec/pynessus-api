@@ -2,6 +2,7 @@
 
 import inspect
 
+
 def multiton(cls):
     """
     Class decorator to make a class a multiton.
@@ -9,33 +10,38 @@ def multiton(cls):
     of initialization parameters.
     """
     instances = {}
+
     def getinstance(*args, **kwargs):
         key = _gen_key(cls, *args, **kwargs)
-                
+
         if key not in instances:
             instances[key] = cls(*args, **kwargs)
         return instances[key]
     return getinstance
 
-kwd_mark = (object(), ) # seperate args and kwargs with a unique object
+
+_kwd_mark = (object(), )  # seperate args and kwargs with a unique object
+
+
 def _gen_key(cls, *args, **kwargs):
     new_args, new_kwargs = _normalize_args(cls.__init__, *args, **kwargs)
 
     key = new_args
     if new_kwargs:
-        key += kwd_mark
+        key += _kwd_mark
         sorted_items = sorted(new_kwargs.items())
         for item in sorted_items:
             key += item
     return tuple(key)
 
+
 def _normalize_args(func, *args, **kwargs):
     try:
         arg_names, _, _, arg_defaults = inspect.getargspec(func)
-    except AttributeError: # cls has no __init__
+    except AttributeError:  # cls has no __init__
         arg_names = ['self']
         arg_defaults = ()
-    arg_names = arg_names[1:] # skip first arg (self)
+    arg_names = arg_names[1:]  # skip first arg (self)
     if arg_defaults is None:
         arg_defaults = ()
 
@@ -59,4 +65,3 @@ def _normalize_args(func, *args, **kwargs):
     new_kwargs.update(kwargs)
 
     return new_args, new_kwargs
-

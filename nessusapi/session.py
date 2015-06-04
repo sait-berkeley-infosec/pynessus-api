@@ -3,6 +3,7 @@
 import requests
 import xmltodict
 
+
 class Session(object):
     def __init__(self, user, pw, host, port, verifySSL=True):
         """Create a session and make it the active one"""
@@ -19,7 +20,7 @@ class Session(object):
             self.token = None
             return True
         return False
-    
+
     def request(self, path, **kwargs):
         """Make a request to a path with specified kwargs"""
         if hasattr(self, 'token'):
@@ -27,7 +28,7 @@ class Session(object):
         elif path != 'login':
             raise AuthenticationError('Invalid session')
 
-        url = 'https://{0}:{1}/{2}'.format(self.host,self.port,path)
+        url = 'https://{0}:{1}/{2}'.format(self.host, self.port, path)
         r = requests.post(url, verify=self.verifySSL, data=kwargs)
 
         if r.status_code != requests.codes.ok:
@@ -38,9 +39,10 @@ class Session(object):
             raise AuthenticationError("Invalid credentials")
         return response_data['contents']
 
+
 class ConnectionError(Exception):
     pass
 
+
 class AuthenticationError(Exception):
     pass
-

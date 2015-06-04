@@ -2,6 +2,7 @@
 
 from .session import request
 
+
 class Template:
     # startTime is scan start date (ISO format)
     # rRules is recurrence frequency and interval
@@ -19,10 +20,10 @@ class Template:
         if self.rRules:
             params['rRules'] = self.rRules
         self.nessus_name = request('scan/template/new', **params)['name']
- 
+
     def edit(self, **kwargs):
-        params = {template: self.nessus_name, template_name: self.nessus_name,
-                  policy_id: self.policy_id, target: self.target}
+        params = {'template': self.nessus_name, 'template_name': self.nessus_name,
+                  'policy_id': self.policy_id, 'target': self.target}
         for kwarg in kwargs:
             params[kwarg] = kwargs[kwarg]
         results = request('scan/template/edit', **params)
@@ -34,8 +35,8 @@ class Template:
     def launch(self):
         """Launch a scan and return its UUID"""
         return request('scan/template/launch',
-                                    template=self.nessus_name)['uuid']
+                       template=self.nessus_name)['uuid']
 
     def delete(self):
         return request('scan/template/new',
-                                    template=self.nessus_name)['status']=='OK'
+                       template=self.nessus_name)['status'] == 'OK'
