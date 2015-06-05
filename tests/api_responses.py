@@ -5,9 +5,10 @@ from requests.exceptions import ConnectionError
 def raise_(ex):
     raise ex
 
+
 def mock_response(response):
-    return mock.Mock(status_code=200,
-                     text=response)
+    return mock.Mock(status_code=200, text=response)
+
 
 def mock_failed_request(status, exception=ConnectionError):
     return mock.Mock(status_code=status,

@@ -24,7 +24,7 @@ class TestSession():
 
         mock_post.assert_called_once_with("https://host:8834/login",
                                           verify=True,
-                                          data={"login":"user",
+                                          data={"login": "user",
                                                 "password": "pwd",
                                                 "token": None})
 
@@ -45,7 +45,7 @@ class TestSession():
 
         assert s.token is not None
         token = s.token
-        
+
         mock_post.return_value = mock_response(xml_logout_success)
         assert s.close() is True
         assert s.token is None
@@ -65,4 +65,3 @@ class TestSession():
         mock_post.return_value = mock_failed_request(status=501)
         with pytest.raises(ConnectionError):
             nessusapi.session.Session("user", "pwd", "host", 8834)
-
