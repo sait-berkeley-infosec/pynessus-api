@@ -10,7 +10,12 @@ class Session(object):
         self.host = host
         self.port = port
         self.verifySSL = verifySSL
-        self.token = self.request('login', login=user, password=pw)['token']
+
+        self.login(user, pw)
+
+    def login(self, user, password):
+        self.token = None
+        self.token = self.request('login', login=user, password=password)['token']
 
     def close(self):
         """Log out of the API and invalidate the token"""
@@ -25,7 +30,7 @@ class Session(object):
         """Make a request to a path with specified kwargs"""
         if hasattr(self, 'token'):
             kwargs['token'] = self.token
-        elif path != 'login':
+        else:
             raise AuthenticationError('Invalid session')
 
         url = 'https://{0}:{1}/{2}'.format(self.host, self.port, path)
@@ -38,10 +43,6 @@ class Session(object):
         if response_data['status'] != 'OK':
             raise AuthenticationError("Invalid credentials")
         return response_data['contents']
-
-
-class ConnectionError(Exception):
-    pass
 
 
 class AuthenticationError(Exception):
